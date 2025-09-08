@@ -1,0 +1,88 @@
+.navbar {
+  width: 100%;
+  background: #fff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-sizing: border-box;
+  overflow: hidden; /* Extra safeguard against overflow */
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 1; /* Prevent left content from overflowing */
+}
+
+.ai-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  flex-shrink: 0; /* Prevent logo from shrinking */
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2563eb;
+  text-decoration: none;
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden;
+  text-overflow: ellipsis; /* If name is long */
+}
+
+/* Navbar Right */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex-shrink: 1; /* Prevent overflow */
+}
+
+.contribution {
+  display: flex;
+  align-items: center;
+  background: #fef9c3;
+  padding: 6px 12px;
+  border-radius: 10px;
+  white-space: nowrap; /* Prevent wrapping */
+}
+
+.coin-icon {
+  font-size: 18px;
+  margin-right: 6px;
+}
+
+.contribution-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 15px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+
+  .contribution-text {
+    font-size: 14px;
+  }
+
+  .ai-logo {
+    width: 32px;
+    height: 32px;
+  }
+}

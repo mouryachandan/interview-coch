@@ -1,0 +1,174 @@
+.interview-container {
+  padding: 60px 20px;
+  font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f4ff, #e6f0ff);
+  min-height: 100vh;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+/* Header */
+.header {
+  margin-bottom: 50px;
+  animation: fadeIn 1.2s ease-in-out;
+  position: relative;
+}
+
+.title {
+  font-size: 40px;
+  font-weight: 900;
+  color: #1e293b;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #475569;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+/* AI Image */
+.ai-image {
+  width: 160px;
+  margin: 30px auto;
+  display: block;
+  border-radius: 20px;
+  box-shadow: 0 15px 30px rgba(37, 99, 235, 0.2);
+  animation: float 4s ease-in-out infinite;
+  transition: transform 0.3s;
+}
+.ai-image:hover {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+/* New Interview Button */
+.new-interview-btn {
+  display: inline-block;
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
+  border-radius: 16px;
+  padding: 18px 45px;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 50px;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+.new-interview-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+  background: linear-gradient(90deg, #4f46e5, #4338ca);
+}
+
+/* Cards Layout */
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+/* Card Styling */
+.card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  max-width: 360px;
+  min-height: 250px;
+  text-align: left;
+  transition: transform 0.4s, box-shadow 0.4s, background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  background: #f9f9ff;
+}
+
+/* Icons */
+.card .icon {
+  font-size: 42px;
+  margin-bottom: 15px;
+}
+
+/* Card Titles */
+.card h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #1e293b;
+}
+
+/* Card Text */
+.card p {
+  font-size: 16px;
+  color: #475569;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+/* Links */
+.link {
+  display: inline-block;
+  background: #f3f4ff;
+  padding: 10px 22px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #4f46e5;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+.link:hover {
+  background: #e0e0ff;
+  transform: translateX(4px) scale(1.05);
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+/* Small Titles */
+.small-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Tips Card */
+.tips-card ul {
+  padding-left: 20px;
+  margin: 0;
+}
+.tips-card li {
+  font-size: 15px;
+  margin: 10px 0;
+  color: #475569;
+  list-style-type: "✅ ";
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
