@@ -22,7 +22,7 @@ const InterviewModal = ({ onClose }) => {
         return;
       }
 
-      navigate("/interview-mode", {
+      navigate("/start-interview", {
         state: { jobTitle, jobTopic, questions },
       });
     } catch (err) {

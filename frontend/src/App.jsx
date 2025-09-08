@@ -9,7 +9,8 @@ import {
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import InterviewPage from "./Interview/InterviewPage"; 
-import InterviewMode from "./Interview/InterviewMode"; // ✅ Import InterviewMode
+import StartInterview from "./Interview/StartInterview"; // ✅ New import
+import InterviewMode from "./Interview/InterviewMode";  
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import Auth from "./Login/Auth"; 
@@ -55,6 +56,16 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <InterviewPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ✅ Start Interview route */}
+          <Route
+            path="/start-interview"
+            element={
+              <ProtectedRoute>
+                <StartInterview />
               </ProtectedRoute>
             }
           />
