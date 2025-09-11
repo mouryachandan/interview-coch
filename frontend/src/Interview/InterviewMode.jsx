@@ -85,7 +85,7 @@ const InterviewMode = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:4000/api/interview/evaluate",
+        "https://interview-cochhh.onrender.com/api/interview/evaluate",
         {
           question: questions[currentIndex],
           userAnswer,

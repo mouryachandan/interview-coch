@@ -14,7 +14,7 @@ const InterviewPage = () => {
     const fetchInterviews = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:4000/api/interview/all", {
+        const res = await axios.get("https://interview-cochhh.onrender.com/api/interview/all", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setInterviews(res.data);
