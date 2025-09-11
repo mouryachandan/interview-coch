@@ -1,1 +1,0 @@
-import{R as e}from"./index-BtCNDqQu.js";const t=()=>e.createElement("div",{className:"loader-container"},e.createElement("div",{className:"spinner"}),e.createElement("p",null,"Loading..."));export{t as default};
