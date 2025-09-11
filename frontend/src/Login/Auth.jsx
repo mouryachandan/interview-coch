@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
+import Swal from "sweetalert2"; // ✅ SweetAlert2 import
 import "./Login.css";
 
 function Auth() {
@@ -28,16 +29,34 @@ function Auth() {
     e.preventDefault();
     try {
       if (isLogin) {
+        // ✅ Login Request
         const res = await API.post("/users/login", {
           email: formData.email,
           password: formData.password,
         });
+
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
-        navigate("/interview");
+
+        // ✅ Login Success Alert
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful 🎉",
+          text: "Welcome back! Redirecting you to your dashboard...",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#4CAF50",
+        }).then(() => {
+          navigate("/interview");
+        });
+
       } else {
+        // ✅ Register Request
         if (formData.password !== formData.confirmPassword) {
-          return alert("Passwords do not match!");
+          return Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Passwords do not match!",
+          });
         }
 
         const data = new FormData();
@@ -47,11 +66,23 @@ function Auth() {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
-        alert("Registration successful! Please verify OTP.");
+        // ✅ Registration Success Alert
+        Swal.fire({
+          icon: "success",
+          title: "Registration Successful 🎉",
+          text: "Your account has been created successfully!",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#4CAF50",
+        });
+
         setIsLogin(true);
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Error occurred");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.response?.data?.message || "Something went wrong!",
+      });
     }
   };
 
@@ -62,7 +93,8 @@ function Auth() {
         <div className="overlay-text">
           <h1>CrackTogether AI Interview Coach</h1>
           <p>
-            Practice mock interviews, track your progress, and improve with AI-powered feedback.
+            Practice mock interviews, track your progress, and improve with
+            AI-powered feedback.
           </p>
         </div>
       </div>
@@ -74,8 +106,8 @@ function Auth() {
             {isLogin ? "Welcome Back!" : "Create Your Account"}
           </h2>
           <p className="login-subtitle">
-            {isLogin 
-              ? "Login to continue your interview practice" 
+            {isLogin
+              ? "Login to continue your interview practice"
               : "Sign up to start improving your interview skills"}
           </p>
 
