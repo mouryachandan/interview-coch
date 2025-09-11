@@ -1,7 +1,7 @@
 // src/services/resumeAPI.js
 import axios from "axios";
 
-const API_URL = "http://localhost:4000/api/resume";
+const API_URL = "https://interview-cochhh.onrender.com/api/resume"; // ✅ deployed backend URL
 
 export const uploadResume = async (file) => {
   const formData = new FormData();
