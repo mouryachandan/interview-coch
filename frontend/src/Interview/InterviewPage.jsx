@@ -36,7 +36,7 @@ const InterviewPage = () => {
     try {
       setUploading(true);
       const res = await axios.post(
-        "http://localhost:4000/api/resume/upload",
+        "https://interview-cochhh.onrender.com/api/resume/upload",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

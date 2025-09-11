@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://interview-cochhh.onrender.com/api", // ✅ Deployed backend URL
+  baseURL: "http://localhost:4000/api",
 });
 
 // Agar token hai to auth header me bhejo
