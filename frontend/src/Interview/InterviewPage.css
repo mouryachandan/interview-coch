@@ -1,3 +1,4 @@
+/* Container */
 .interview-container {
   padding: 60px 20px;
   font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -13,14 +14,12 @@
   animation: fadeIn 1.2s ease-in-out;
   position: relative;
 }
-
 .title {
-  font-size: 40px;
+  font-size: 42px;
   font-weight: 900;
   color: #1e293b;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
 }
-
 .subtitle {
   font-size: 18px;
   color: #475569;
@@ -42,24 +41,52 @@
   transform: scale(1.1) rotate(-3deg);
 }
 
-/* New Interview Button */
-.new-interview-btn {
+/* Buttons */
+.new-interview-btn,
+.resume-upload-btn {
   display: inline-block;
-  background: linear-gradient(90deg, #6366f1, #4f46e5);
   border-radius: 16px;
-  padding: 18px 45px;
+  padding: 16px 45px;
   font-size: 18px;
   font-weight: 700;
   color: white;
   cursor: pointer;
-  margin-bottom: 50px;
+  margin: 10px 10px 50px 10px;
   transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+.new-interview-btn {
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
 }
 .new-interview-btn:hover {
   transform: scale(1.08);
   box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
   background: linear-gradient(90deg, #4f46e5, #4338ca);
+}
+.resume-upload-btn {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+.resume-upload-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.5);
+  background: linear-gradient(90deg, #059669, #047857);
+}
+
+/* Hidden File Input */
+.resume-upload-btn input[type="file"] {
+  display: none;
+}
+
+/* Success Message */
+.resume-success {
+  display: block;
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #10b981;
+  animation: fadeIn 1s ease-in-out;
 }
 
 /* Cards Layout */
@@ -163,10 +190,9 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
+  from { opacity: 0; transform: translateY(-15px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes float {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-12px); }

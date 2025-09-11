@@ -13,7 +13,7 @@ const generateInterviewQuestions = async (req, res) => {
 
     const prompt = `
       You are an experienced technical interviewer.
-      Generate 8 interview questions for the job role "${jobTitle}".
+      Generate 17 interview questions for the job role "${jobTitle}".
       Focus on these skills: ${jobTopic}.
       
       Rules:

@@ -1,70 +1,118 @@
+/* Navbar Base */
 .navbar {
   width: 100%;
-  background: #fff;
-  padding: 12px 20px;
+  background: #ffffff;
+  padding: 14px 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   position: sticky;
   top: 0;
   z-index: 100;
   box-sizing: border-box;
-  overflow: hidden; /* Extra safeguard against overflow */
 }
 
+/* Left Side */
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 1; /* Prevent left content from overflowing */
+  gap: 12px;
 }
 
 .ai-logo {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 12px;
-  flex-shrink: 0; /* Prevent logo from shrinking */
+  transition: transform 0.3s, box-shadow 0.4s;
+}
+.ai-logo:hover {
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); /* Glow effect */
 }
 
 .logo {
-  font-size: 22px;
-  font-weight: bold;
+  font-size: 24px;
+  font-weight: 800;
   color: #2563eb;
   text-decoration: none;
-  white-space: nowrap; /* Prevent wrapping */
-  overflow: hidden;
-  text-overflow: ellipsis; /* If name is long */
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+.logo:hover {
+  color: #1d4ed8;
 }
 
-/* Navbar Right */
+/* Right Side: Profile */
 .navbar-right {
+  position: relative;
+}
+
+.profile-link {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  flex-shrink: 1; /* Prevent overflow */
+  justify-content: center;
+  border-radius: 50%;
+  padding: 4px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.profile-link:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.contribution {
-  display: flex;
-  align-items: center;
-  background: #fef9c3;
-  padding: 6px 12px;
-  border-radius: 10px;
-  white-space: nowrap; /* Prevent wrapping */
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
-.coin-icon {
-  font-size: 18px;
-  margin-right: 6px;
+/* Dropdown */
+.profile-dropdown {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  padding: 10px 0;
+  width: 140px;
+  animation: fadeInDropdown 0.3s ease-out;
+  z-index: 200;
 }
 
-.contribution-text {
-  font-size: 15px;
+.dropdown-item {
+  display: block;
+  padding: 10px 20px;
+  color: #1e293b;
   font-weight: 500;
-  color: #4f46e5;
   text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #f3f4ff;
+  color: #4f46e5;
+}
+
+.logout {
+  color: #ef4444;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.logout:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Animations */
+@keyframes fadeInDropdown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Responsive */
@@ -74,15 +122,51 @@
   }
 
   .logo {
-    font-size: 18px;
+    font-size: 20px;
   }
 
-  .contribution-text {
-    font-size: 14px;
+  .ai-logo,
+  .profile-icon {
+    width: 35px;
+    height: 35px;
   }
 
-  .ai-logo {
-    width: 32px;
-    height: 32px;
+  .profile-dropdown {
+    width: 120px;
   }
+}
+.profile-panel {
+  position: absolute;
+  top: 60px; /* Navbar ke neeche */
+  right: 20px;
+  background: #fff;
+  padding: 20px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  z-index: 100;
+  width: 250px;
+  text-align: center;
+}
+
+.profile-pic {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 12px;
+}
+
+.logout-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #f43f5e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
 }

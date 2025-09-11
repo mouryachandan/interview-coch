@@ -1,97 +1,113 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
-import InterviewPage from "./Interview/InterviewPage"; 
-import StartInterview from "./Interview/StartInterview"; // ✅ New import
-import InterviewMode from "./Interview/InterviewMode";  
-import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/Navbar";
-import Auth from "./Login/Auth"; 
+// Lazy loaded components
+const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
+const Navbar = lazy(() => import("./components/Navbar"));
+const Loader = lazy(() => import("./components/Loader"));
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Profile = lazy(() => import("./pages/Profile"));
+const InterviewPage = lazy(() => import("./Interview/InterviewPage"));
+const StartInterview = lazy(() => import("./Interview/StartInterview"));
+const InterviewMode = lazy(() => import("./Interview/InterviewMode"));
+const ResumeInterview = lazy(() => import("./resume/ResumeUpload"));
+const Auth = lazy(() => import("./Login/Auth"));
 
 function AppContent() {
   const location = useLocation();
-
-  // Navbar sirf /auth pe hide होगा
   const hideNavbarRoutes = ["/auth"];
 
   return (
-    <>
-      {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
-
+    <Suspense fallback={<Loader />}>
+      {!hideNavbarRoutes.includes(location.pathname) && (
+        <Suspense fallback={<Loader />}>
+          <Navbar />
+        </Suspense>
+      )}
       <div className="p-6">
         <Routes>
-          {/* Auth route */}
-          <Route path="/auth" element={<Auth />} />
-
-          {/* Default Route -> Dashboard */}
+          {/* ✅ Root path directly Dashboard render karega */}
           <Route
             path="/"
             element={
-              <ProtectedRoute>
+              <Suspense fallback={<Loader />}>
                 <Dashboard />
-              </ProtectedRoute>
+              </Suspense>
             }
           />
 
-          {/* Dashboard route */}
+          <Route
+            path="/auth"
+            element={
+              <Suspense fallback={<Loader />}>
+                <Auth />
+              </Suspense>
+            }
+          />
+
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
+              <Suspense fallback={<Loader />}>
                 <Dashboard />
-              </ProtectedRoute>
+              </Suspense>
             }
           />
 
-          {/* Interview Page route */}
           <Route
             path="/interview"
             element={
-              <ProtectedRoute>
-                <InterviewPage />
-              </ProtectedRoute>
+              <Suspense fallback={<Loader />}>
+                <ProtectedRoute>
+                  <InterviewPage />
+                </ProtectedRoute>
+              </Suspense>
             }
           />
-
-          {/* ✅ Start Interview route */}
           <Route
             path="/start-interview"
             element={
-              <ProtectedRoute>
-                <StartInterview />
-              </ProtectedRoute>
+              <Suspense fallback={<Loader />}>
+                <ProtectedRoute>
+                  <StartInterview />
+                </ProtectedRoute>
+              </Suspense>
             }
           />
-
-          {/* Interview Mode route */}
           <Route
             path="/interview-mode"
             element={
-              <ProtectedRoute>
-                <InterviewMode />
-              </ProtectedRoute>
+              <Suspense fallback={<Loader />}>
+                <ProtectedRoute>
+                  <InterviewMode />
+                </ProtectedRoute>
+              </Suspense>
             }
           />
-
-          {/* Profile route */}
+          <Route
+            path="/resume-interview"
+            element={
+              <Suspense fallback={<Loader />}>
+                <ProtectedRoute>
+                  <ResumeInterview />
+                </ProtectedRoute>
+              </Suspense>
+            }
+          />
           <Route
             path="/profile"
             element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
+              <Suspense fallback={<Loader />}>
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              </Suspense>
             }
           />
         </Routes>
       </div>
-    </>
+    </Suspense>
   );
 }
 
