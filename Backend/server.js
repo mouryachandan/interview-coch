@@ -8,7 +8,14 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors());
+
+// ✅ CORS config
+app.use(cors({
+  origin: "*", // abhi sab allow kar do (baad me frontend domain add karna better hoga)
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
 
 // ✅ Serve uploads folder with absolute path
@@ -17,10 +24,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ==================== Routes ====================
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/interview", require("./routes/interviewRoutes"));
-app.use("/api/resume", require("./routes/resumeRoutes"));      // ✅ Resume Upload
-//app.use("/api/analysis", require("./routes/analysisRoutes"));  // ✅ Answer Evaluation
-//app.use("/api/leaderboard", require("./routes/leaderboardRoutes")); // ✅ Gamification
-//app.use("/api/tips", require("./routes/tipsRoutes"));          // ✅ Interview Tips
+app.use("/api/resume", require("./routes/resumeRoutes"));      
 
 // ==================== Start Server ====================
 const PORT = process.env.PORT || 4000;
