@@ -1,8 +1,9 @@
 import axios from "axios";
 import { showAppError } from "./appAlert";
 
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000/api",
+  baseURL: import.meta.env.VITE_API_URL || "https://interview-cochhh.onrender.com/api",
 });
 
 API.interceptors.request.use((req) => {
