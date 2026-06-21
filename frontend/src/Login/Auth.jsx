@@ -9,67 +9,98 @@ import {
 } from "lucide-react";
 import "./Login.css";
 
+const EMPTY_REGISTER = {
+  fullName: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
+
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [registerData, setRegisterData] = useState(EMPTY_REGISTER);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const goToLogin = () => {
+    setIsLogin(true);
+    setShowLoginPassword(false);
   };
 
-  const handleSubmit = async (e) => {
+  const goToRegister = () => {
+    setRegisterData({ ...EMPTY_REGISTER });
+    setShowRegPassword(false);
+    setShowConfirmPassword(false);
+    setIsLogin(false);
+  };
+
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-
-    if (!isLogin && formData.password.length < 6) {
-      showAppError("Password must be at least 6 characters long.", "Password too short");
-      return;
-    }
-
     setLoading(true);
     try {
-      if (isLogin) {
-        const res = await API.post("/users/login", {
-          email: formData.email.trim().toLowerCase(),
-          password: formData.password,
-        });
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        toast.success("Welcome back!");
-        navigate("/interview");
-      } else {
-        if (formData.password !== formData.confirmPassword) {
-          showAppError("Please make sure both password fields match.", "Passwords don't match");
-          return;
-        }
-        await API.post("/users/register", {
-          fullName: formData.fullName,
-          email: formData.email.trim().toLowerCase(),
-          password: formData.password,
-        });
-        toast.success("Account created! Please sign in.");
-        setIsLogin(true);
-      }
+      const res = await API.post("/users/login", {
+        email: loginData.email.trim().toLowerCase(),
+        password: loginData.password,
+      });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      toast.success("Welcome back!");
+      navigate("/interview", { replace: true });
     } catch (error) {
       const msg = error.response?.data?.message || error.response?.data?.error || "Something went wrong. Please try again.";
-      showAppError(msg, isLogin ? "Sign in failed" : "Registration failed");
+      showAppError(msg, "Sign in failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const switchMode = (login) => {
-    setIsLogin(login);
-    setShowPassword(false);
-    setShowConfirmPassword(false);
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+
+    if (registerData.password.length < 6) {
+      showAppError("Password must be at least 6 characters long.", "Password too short");
+      return;
+    }
+    if (registerData.password !== registerData.confirmPassword) {
+      showAppError("Please make sure both password fields match.", "Passwords don't match");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const email = registerData.email.trim().toLowerCase();
+      const password = registerData.password;
+
+      const res = await API.post("/users/register", {
+        fullName: registerData.fullName,
+        email,
+        password,
+      });
+
+      let { token, user } = res.data;
+
+      // Fallback: auto-login if older backend response has no token
+      if (!token) {
+        const loginRes = await API.post("/users/login", { email, password });
+        token = loginRes.data.token;
+        user = loginRes.data.user;
+      }
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      setRegisterData({ ...EMPTY_REGISTER });
+      toast.success("Account created! Welcome aboard!");
+      navigate("/interview", { replace: true });
+    } catch (error) {
+      const msg = error.response?.data?.message || error.response?.data?.error || "Something went wrong. Please try again.";
+      showAppError(msg, "Registration failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,115 +146,172 @@ function Auth() {
         <div className="auth-right-bg" />
         <div className="auth-card">
           <div className="auth-tabs">
-            <button
-              type="button"
-              className={`auth-tab ${isLogin ? "active" : ""}`}
-              onClick={() => switchMode(true)}
-            >
+            <button type="button" className={`auth-tab ${isLogin ? "active" : ""}`} onClick={goToLogin}>
               Sign In
             </button>
-            <button
-              type="button"
-              className={`auth-tab ${!isLogin ? "active" : ""}`}
-              onClick={() => switchMode(false)}
-            >
+            <button type="button" className={`auth-tab ${!isLogin ? "active" : ""}`} onClick={goToRegister}>
               Register
             </button>
           </div>
 
-          <div className="auth-card-header">
-            <h2>{isLogin ? "Welcome back" : "Create your account"}</h2>
-            <p className="auth-subtitle">
-              {isLogin
-                ? "Sign in to continue your interview journey"
-                : "Create account with email and password (min. 6 characters)"}
-            </p>
-          </div>
+          {isLogin ? (
+            <>
+              <div className="auth-card-header">
+                <h2>Welcome back</h2>
+                <p className="auth-subtitle">Sign in to continue your interview journey</p>
+              </div>
 
-          <form onSubmit={handleSubmit} className="auth-form">
-            {!isLogin && (
-              <div className="input-field">
-                <label htmlFor="fullName">Full Name</label>
-                <div className="input-group">
-                  <User size={18} className="input-icon" />
-                  <input id="fullName" type="text" name="fullName" placeholder="John Doe" value={formData.fullName} onChange={handleChange} required />
+              <form onSubmit={handleLoginSubmit} className="auth-form" autoComplete="on">
+                <div className="input-field">
+                  <label htmlFor="login-email">Email Address</label>
+                  <div className="input-group">
+                    <Mail size={18} className="input-icon" />
+                    <input
+                      id="login-email"
+                      type="email"
+                      name="login-email"
+                      placeholder="you@example.com"
+                      value={loginData.email}
+                      onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                      autoComplete="username"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
 
-            <div className="input-field">
-              <label htmlFor="email">Email Address</label>
-              <div className="input-group">
-                <Mail size={18} className="input-icon" />
-                <input id="email" type="email" name="email" placeholder="you@example.com" value={formData.email} onChange={handleChange} required />
-              </div>
-            </div>
+                <div className="input-field">
+                  <label htmlFor="login-password">Password</label>
+                  <div className="input-group">
+                    <Lock size={18} className="input-icon" />
+                    <input
+                      id="login-password"
+                      type={showLoginPassword ? "text" : "password"}
+                      name="login-password"
+                      placeholder="Enter your password"
+                      value={loginData.password}
+                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                      className="input-with-toggle"
+                      autoComplete="current-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      aria-label={showLoginPassword ? "Hide password" : "Show password"}
+                    >
+                      {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
 
-            <div className="input-field">
-              <label htmlFor="password">Password</label>
-              <div className="input-group">
-                <Lock size={18} className="input-icon" />
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder={isLogin ? "Enter your password" : "Min. 6 characters"}
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="input-with-toggle"
-                  minLength={isLogin ? undefined : 6}
-                  required
-                />
-                <button
-                  type="button"
-                  className="password-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                <button type="submit" className="auth-submit" disabled={loading}>
+                  {loading ? <span className="auth-submit-loading">Please wait...</span> : <>Sign In<ArrowRight size={18} /></>}
                 </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <div className="auth-card-header">
+                <h2>Create your account</h2>
+                <p className="auth-subtitle">Create account with email and password (min. 6 characters)</p>
               </div>
-            </div>
 
-            {!isLogin && (
-              <div className="input-field">
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <div className="input-group">
-                  <Lock size={18} className="input-icon" />
-                  <input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    placeholder="Re-enter password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="input-with-toggle"
-                    minLength={6}
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+              <form onSubmit={handleRegisterSubmit} className="auth-form" autoComplete="off">
+                <div className="input-field">
+                  <label htmlFor="reg-fullName">Full Name</label>
+                  <div className="input-group">
+                    <User size={18} className="input-icon" />
+                    <input
+                      id="reg-fullName"
+                      type="text"
+                      name="reg-fullName"
+                      placeholder="John Doe"
+                      value={registerData.fullName}
+                      onChange={(e) => setRegisterData({ ...registerData, fullName: e.target.value })}
+                      autoComplete="off"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
 
-            <button type="submit" className="auth-submit" disabled={loading}>
-              {loading ? (
-                <span className="auth-submit-loading">Please wait...</span>
-              ) : (
-                <>
-                  {isLogin ? "Sign In" : "Create Account"}
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
-          </form>
+                <div className="input-field">
+                  <label htmlFor="reg-email">Email Address</label>
+                  <div className="input-group">
+                    <Mail size={18} className="input-icon" />
+                    <input
+                      id="reg-email"
+                      type="email"
+                      name="reg-email"
+                      placeholder="you@example.com"
+                      value={registerData.email}
+                      onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                      autoComplete="off"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="input-field">
+                  <label htmlFor="reg-password">Password</label>
+                  <div className="input-group">
+                    <Lock size={18} className="input-icon" />
+                    <input
+                      id="reg-password"
+                      type={showRegPassword ? "text" : "password"}
+                      name="reg-password"
+                      placeholder="Min. 6 characters"
+                      value={registerData.password}
+                      onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                      className="input-with-toggle"
+                      autoComplete="new-password"
+                      minLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowRegPassword(!showRegPassword)}
+                      aria-label={showRegPassword ? "Hide password" : "Show password"}
+                    >
+                      {showRegPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="input-field">
+                  <label htmlFor="reg-confirmPassword">Confirm Password</label>
+                  <div className="input-group">
+                    <Lock size={18} className="input-icon" />
+                    <input
+                      id="reg-confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="reg-confirmPassword"
+                      placeholder="Re-enter password"
+                      value={registerData.confirmPassword}
+                      onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
+                      className="input-with-toggle"
+                      autoComplete="new-password"
+                      minLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                <button type="submit" className="auth-submit" disabled={loading}>
+                  {loading ? <span className="auth-submit-loading">Please wait...</span> : <>Create Account<ArrowRight size={18} /></>}
+                </button>
+              </form>
+            </>
+          )}
 
           <p className="auth-secure">
             <Shield size={14} />

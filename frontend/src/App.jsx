@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
+const GuestRoute = lazy(() => import("./components/GuestRoute"));
 const Navbar = lazy(() => import("./components/Navbar"));
 const Loader = lazy(() => import("./components/Loader"));
 const AppLayout = lazy(() => import("./layouts/AppLayout"));
@@ -62,9 +63,9 @@ function AppContent() {
     <Suspense fallback={<Loader />}>
       <LayoutWrapper>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/auth" element={<Auth />} />
+          <Route path="/" element={<GuestRoute><Dashboard /></GuestRoute>} />
+          <Route path="/dashboard" element={<GuestRoute><Dashboard /></GuestRoute>} />
+          <Route path="/auth" element={<GuestRoute><Auth /></GuestRoute>} />
 
           <Route path="/interview" element={<ProtectedRoute><InterviewPage /></ProtectedRoute>} />
           <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
