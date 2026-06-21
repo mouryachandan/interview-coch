@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const pdf = require("pdf-parse");
 const axios = require("axios");
+const Interview = require("../models/Interview");
 
 // ================= Multer Storage =================
 const storage = multer.diskStorage({
@@ -75,9 +76,32 @@ const uploadResume = async (req, res) => {
 
     // Convert AI response into questions array
     const questionsText = response.data.choices[0].message.content;
-    const questions = questionsText.split("\n").filter(q => q.trim() !== "");
+    const questions = questionsText
+      .split("\n")
+      .map((q) => q.replace(/^\d+[\.\)]\s*/, "").trim())
+      .filter((q) => q.length > 0)
+      .slice(0, 10);
 
-    res.json({ result: questionsText, questions });
+    const skillSummary = skills.length > 0 ? skills.join(", ") : "General Skills";
+
+    let interview = null;
+    if (req.user) {
+      interview = await Interview.create({
+        userId: req.user,
+        jobTitle: "Resume-based Role",
+        jobTopic: skillSummary,
+        questions,
+        status: "pending",
+        fromResume: true,
+      });
+    }
+
+    res.json({
+      result: skillSummary,
+      questions,
+      skills,
+      interviewId: interview?._id || null,
+    });
   } catch (err) {
     console.error("Resume Error:", err.response?.data || err.message);
     res.status(500).json({ error: "Resume processing failed" });

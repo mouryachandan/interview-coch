@@ -21,6 +21,9 @@ app.use(express.json());
 // ✅ Serve uploads folder with absolute path
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// Health check
+app.get("/api/health", (req, res) => res.json({ status: "ok", version: "2.0" }));
+
 // ==================== Routes ====================
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/interview", require("./routes/interviewRoutes"));

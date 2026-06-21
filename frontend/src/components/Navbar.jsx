@@ -1,71 +1,115 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import "./Navbar.css";
 
-const aiLogoUrl = "https://cdn-icons-png.flaticon.com/512/4712/4712011.png";
-
 function Navbar() {
-  const [showProfilePanel, setShowProfilePanel] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const navigate = useNavigate();
-
-  const user = JSON.parse(localStorage.getItem("user")); // User details from localStorage
+  const location = useLocation();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    toast.success("Logged out successfully!", { autoClose: 2000, theme: "colored" });
-    setShowProfilePanel(false);
-    navigate("/dashboard");
+    toast.success("Logged out successfully!");
+    setShowMenu(false);
+    navigate("/");
   };
+
+  const navLinks = user
+    ? [
+        { to: "/interview", label: "Dashboard" },
+        { to: "/profile", label: "Profile" },
+      ]
+    : [];
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
       <nav className="navbar">
-        <div className="navbar-left">
-          <img src={aiLogoUrl} alt="AI Logo" className="ai-logo" />
-          <Link className="logo">
-            CrackTogether
+        <div className="navbar-inner">
+          <Link to={user ? "/interview" : "/"} className="navbar-brand">
+            <div className="brand-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" opacity="0.9"/>
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="brand-name">CrackTogether</span>
           </Link>
-        </div>
 
-        <div className="navbar-right">
-          <div
-            className="profile-link"
-            onClick={() => {
-              if (!user) {
-                toast.info("⚠ Please login to view profile!", { autoClose: 3000, theme: "colored" });
-                return;
-              }
-              setShowProfilePanel(!showProfilePanel);
-            }}
-          >
-            <img
-              src={user?.profilePic || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
-              alt="Profile"
-              className="profile-icon"
-            />
+          <div className="navbar-center">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`nav-link ${isActive(link.to) ? "active" : ""}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="navbar-right">
+            {user ? (
+              <div className="profile-wrapper">
+                <button
+                  className="profile-btn"
+                  onClick={() => setShowMenu(!showMenu)}
+                >
+                  <img
+                    src={user.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=4f46e5&color=fff`}
+                    alt="Profile"
+                    className="profile-avatar"
+                  />
+                  <span className="profile-name">{user.fullName?.split(" ")[0]}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M6 9l6 6 6-6"/>
+                  </svg>
+                </button>
+
+                {showMenu && (
+                  <div className="profile-dropdown">
+                    <div className="dropdown-header">
+                      <img
+                        src={user.profilePic || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=4f46e5&color=fff`}
+                        alt=""
+                        className="dropdown-avatar"
+                      />
+                      <div>
+                        <p className="dropdown-name">{user.fullName}</p>
+                        <p className="dropdown-email">{user.email}</p>
+                      </div>
+                    </div>
+                    {user.points > 0 && (
+                      <div className="dropdown-points">
+                        <span>⭐ {user.points} points</span>
+                      </div>
+                    )}
+                    <div className="dropdown-divider" />
+                    <Link to="/profile" className="dropdown-item" onClick={() => setShowMenu(false)}>
+                      View Profile
+                    </Link>
+                    <Link to="/interview" className="dropdown-item" onClick={() => setShowMenu(false)}>
+                      My Interviews
+                    </Link>
+                    <button className="dropdown-item danger" onClick={handleLogout}>
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="auth-buttons">
+                <Link to="/auth" className="btn-ghost">Sign In</Link>
+                <Link to="/auth" className="btn-primary-sm">Get Started</Link>
+              </div>
+            )}
           </div>
         </div>
       </nav>
-
-      {/* Inline Profile Panel */}
-      {showProfilePanel && user && (
-        <div className="profile-panel">
-          <img
-            src={user.profilePic || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"}
-            alt="Profile"
-            className="profile-pic"
-          />
-          <p><strong>Name:</strong> {user.fullName}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Mobile:</strong> {user.mobile}</p>
-          <button className="logout-btn" onClick={handleLogout}>Logout</button>
-        </div>
-      )}
-
-      <ToastContainer />
     </>
   );
 }

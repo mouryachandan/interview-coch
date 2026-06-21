@@ -2,10 +2,11 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 
 export default function ProtectedRoute({ children }) {
-  const user = JSON.parse(localStorage.getItem("user")); // ya Redux state
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
-  if (!user) {
-    return <Navigate to="/auth" replace />; // login page pe redirect if not logged in
+  if (!token || !user) {
+    return <Navigate to="/auth" replace />;
   }
 
   return children;

@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const protect = require("../middleware/authMiddleware");
 const { upload, uploadResume } = require("../controllers/resumeController");
 
-// ✅ POST /api/resume/upload
-router.post("/upload", upload.single("resume"), uploadResume);
+router.post("/upload", protect, upload.single("resume"), uploadResume);
 
 module.exports = router;

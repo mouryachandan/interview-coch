@@ -8,8 +8,17 @@ const userSchema = mongoose.Schema(
     password: { type: String, required: true },
     profilePic: { type: String },
     points: { type: Number, default: 0 },
-      badges: [{ type: String }],
-   
+    badges: [{ type: String }],
+    streak: { type: Number, default: 0 },
+    lastActiveDate: { type: Date },
+    interviewsCompleted: { type: Number, default: 0 },
+    level: { type: Number, default: 1 },
+    hasPerfectScore: { type: Boolean, default: false },
+    settings: {
+      darkMode: { type: Boolean, default: false },
+      emailNotifications: { type: Boolean, default: true },
+      timerEnabled: { type: Boolean, default: true },
+    },
   },
   { timestamps: true }
 );
