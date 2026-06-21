@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Upload, FileText, CheckCircle, Sparkles, Brain, ListChecks } from "lucide-react";
 import { uploadResume } from "../services/resumeAPI";
 import { toast } from "react-toastify";
+import { showAppError } from "../utils/appAlert";
 import "./ResumeUpload.css";
 
 const STEPS = [
@@ -20,7 +21,7 @@ const ResumeUpload = () => {
   const processFile = async (file) => {
     if (!file) return;
     if (!file.name.endsWith(".pdf")) {
-      toast.error("Please upload a PDF resume");
+      showAppError("Only PDF files are supported. Please upload a .pdf resume.", "Invalid file type");
       return;
     }
     try {
@@ -29,7 +30,7 @@ const ResumeUpload = () => {
       setLastResult(res);
       toast.success(`Found ${res.skills?.length || 0} skills — ${res.questions?.length} questions ready!`);
     } catch (err) {
-      toast.error(err.response?.data?.error || "Resume upload failed.");
+      showAppError(err.response?.data?.error || "Resume upload failed. Please try again.", "Upload failed");
     } finally {
       setUploading(false);
     }

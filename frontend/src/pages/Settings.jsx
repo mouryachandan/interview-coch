@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Moon, Sun, Bell, Timer, Save, User, Mail, Shield } from "lucide-react";
 import { updateSettings } from "../services/userAPI";
 import { toast } from "react-toastify";
+import { showAppError } from "../utils/appAlert";
 import "./Settings.css";
 
 function Settings() {
@@ -29,7 +30,7 @@ function Settings() {
       localStorage.setItem("user", JSON.stringify({ ...stored, settings: updated.settings }));
       toast.success("Settings saved!");
     } catch {
-      toast.error("Failed to save settings");
+      showAppError("Your settings could not be saved. Please try again.", "Save failed");
     } finally {
       setSaving(false);
     }

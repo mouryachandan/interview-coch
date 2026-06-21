@@ -4,6 +4,7 @@ import Webcam from "react-webcam";
 import { Mic, MicOff, SkipForward, Volume2, Timer, ArrowLeft } from "lucide-react";
 import { evaluateAnswer, saveInterviewResult } from "../services/interviewAPI";
 import { toast } from "react-toastify";
+import { showAppError } from "../utils/appAlert";
 import "./InterviewMode.css";
 
 const InterviewMode = () => {
@@ -43,7 +44,7 @@ const InterviewMode = () => {
   const startListening = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      toast.error("Speech recognition not supported in this browser");
+      showAppError("Speech recognition is not supported in this browser. Try Chrome or Edge.", "Browser not supported");
       return;
     }
     if (recognitionRef.current) recognitionRef.current.stop();
@@ -118,7 +119,7 @@ const InterviewMode = () => {
         setFeedback(result.feedback);
         setFeedbackScore(result.score);
       } catch {
-        toast.error("Evaluation failed. Moving to next question.");
+        showAppError("We couldn't evaluate your answer. Moving to the next question.", "Evaluation failed");
       } finally {
         setEvaluating(false);
       }

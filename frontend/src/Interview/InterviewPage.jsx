@@ -8,6 +8,7 @@ import { getDashboard, syncUserToStorage } from "../services/userAPI";
 import { deleteInterview } from "../services/interviewAPI";
 import { uploadResume } from "../services/resumeAPI";
 import { toast } from "react-toastify";
+import { showAppError } from "../utils/appAlert";
 import InterviewModal from "./InterviewModal";
 import WelcomeModal from "../components/WelcomeModal";
 import EmptyState from "../components/EmptyState";
@@ -40,7 +41,10 @@ const InterviewPage = () => {
         return;
       }
       setError(msg);
-      toast.error(msg === "Network Error" ? "Cannot reach server. Is backend running on port 4000?" : `Could not load data: ${msg}`);
+      showAppError(
+        msg === "Network Error" ? "Cannot reach server. Is backend running on port 4000?" : `Could not load data: ${msg}`,
+        "Failed to load dashboard"
+      );
     } finally {
       setLoading(false);
     }
@@ -62,7 +66,7 @@ const InterviewPage = () => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.name.endsWith(".pdf")) {
-      toast.error("Please upload a PDF resume");
+      showAppError("Only PDF files are supported. Please upload a .pdf resume.", "Invalid file type");
       return;
     }
     try {
@@ -79,7 +83,7 @@ const InterviewPage = () => {
         },
       });
     } catch (err) {
-      toast.error(err.response?.data?.error || "Resume upload failed.");
+      showAppError(err.response?.data?.error || "Resume upload failed. Please try again.", "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -93,7 +97,7 @@ const InterviewPage = () => {
       toast.success("Interview deleted");
       loadDashboard();
     } catch {
-      toast.error("Failed to delete");
+      showAppError("Could not delete this interview. Please try again.", "Delete failed");
     }
   };
 

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { X, Briefcase, Code, Gauge, Layers, Hash } from "lucide-react";
 import { fetchInterviewQuestions } from "../services/interviewAPI";
 import { toast } from "react-toastify";
+import { showAppError } from "../utils/appAlert";
 import "./InterviewModal.css";
 
 const ROLES = [
@@ -21,7 +22,7 @@ const InterviewModal = ({ onClose, onSuccess }) => {
 
   const handleStart = async () => {
     if (!jobTitle.trim() || !jobTopic.trim()) {
-      toast.error("Please fill in all fields");
+      showAppError("Please fill in job title and topic before starting.", "Missing fields");
       return;
     }
     setLoading(true);
@@ -30,7 +31,7 @@ const InterviewModal = ({ onClose, onSuccess }) => {
         difficulty, interviewType, questionCount,
       });
       if (!data.questions?.length) {
-        toast.error("Failed to generate questions. Try again.");
+        showAppError("We couldn't generate questions. Please try again.", "Generation failed");
         return;
       }
       if (onSuccess) onSuccess();
@@ -42,7 +43,7 @@ const InterviewModal = ({ onClose, onSuccess }) => {
         },
       });
     } catch (err) {
-      toast.error(err.response?.data?.error || "Error generating questions. Check your login & API key.");
+      showAppError(err.response?.data?.error || "Error generating questions. Check your login & API key.", "Interview setup failed");
     } finally {
       setLoading(false);
     }

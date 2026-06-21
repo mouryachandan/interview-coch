@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { Sparkles, Mail, Lock, User, Phone, Camera } from "lucide-react";
+import { showAppError } from "../utils/appAlert";
+import { Sparkles, Mail, Lock, User, Phone, Camera, Eye, EyeOff } from "lucide-react";
 import "./Login.css";
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
@@ -42,7 +44,7 @@ function Auth() {
         navigate("/interview");
       } else {
         if (formData.password !== formData.confirmPassword) {
-          toast.error("Passwords do not match!");
+          showAppError("Please make sure both password fields match.", "Passwords don't match");
           return;
         }
         const data = new FormData();
@@ -56,10 +58,17 @@ function Auth() {
         setIsLogin(true);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong!");
+      const msg = error.response?.data?.message || error.response?.data?.error || "Something went wrong. Please try again.";
+      showAppError(msg, isLogin ? "Sign in failed" : "Registration failed");
     } finally {
       setLoading(false);
     }
+  };
+
+  const switchMode = () => {
+    setIsLogin(!isLogin);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   return (
@@ -119,16 +128,47 @@ function Auth() {
               <Mail size={18} className="input-icon" />
               <input type="email" name="email" placeholder="Email address" onChange={handleChange} required />
             </div>
+
             <div className="input-group">
               <Lock size={18} className="input-icon" />
-              <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                onChange={handleChange}
+                className="input-with-toggle"
+                required
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
 
             {!isLogin && (
               <>
                 <div className="input-group">
                   <Lock size={18} className="input-icon" />
-                  <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} required />
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    onChange={handleChange}
+                    className="input-with-toggle"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
                 <label className="file-upload">
                   <Camera size={18} />
@@ -145,7 +185,7 @@ function Auth() {
 
           <p className="auth-toggle">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button type="button" onClick={() => setIsLogin(!isLogin)}>
+            <button type="button" onClick={switchMode}>
               {isLogin ? "Sign Up" : "Sign In"}
             </button>
           </p>

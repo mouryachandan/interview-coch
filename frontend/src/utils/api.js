@@ -1,5 +1,5 @@
 import axios from "axios";
-import { toast } from "react-toastify";
+import { showAppError } from "./appAlert";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:4000/api",
@@ -21,7 +21,7 @@ API.interceptors.response.use(
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       if (!window.location.pathname.includes("/auth")) {
-        toast.error("Session expired. Please login again.");
+        showAppError("Your session has expired. Please sign in again.", "Session expired");
         window.location.href = "/auth";
       }
     } else if (status === 500) {
