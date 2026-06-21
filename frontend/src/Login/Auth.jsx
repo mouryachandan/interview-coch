@@ -3,7 +3,10 @@ import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
 import { toast } from "react-toastify";
 import { showAppError } from "../utils/appAlert";
-import { Sparkles, Mail, Lock, User, Phone, Camera, Eye, EyeOff } from "lucide-react";
+import {
+  Sparkles, Mail, Lock, User, Phone, Camera, Eye, EyeOff,
+  ArrowRight, Shield, Zap, BarChart3,
+} from "lucide-react";
 import "./Login.css";
 
 function Auth() {
@@ -35,7 +38,7 @@ function Auth() {
     try {
       if (isLogin) {
         const res = await API.post("/users/login", {
-          email: formData.email,
+          email: formData.email.trim().toLowerCase(),
           password: formData.password,
         });
         localStorage.setItem("token", res.data.token);
@@ -51,6 +54,7 @@ function Auth() {
         Object.keys(formData).forEach((key) => {
           if (formData[key]) data.append(key, formData[key]);
         });
+        data.set("email", formData.email.trim().toLowerCase());
         await API.post("/users/register", data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
@@ -65,8 +69,8 @@ function Auth() {
     }
   };
 
-  const switchMode = () => {
-    setIsLogin(!isLogin);
+  const switchMode = (login) => {
+    setIsLogin(login);
     setShowPassword(false);
     setShowConfirmPassword(false);
   };
@@ -74,9 +78,13 @@ function Auth() {
   return (
     <div className="auth-page">
       <div className="auth-left">
+        <div className="auth-left-glow auth-left-glow--1" />
+        <div className="auth-left-glow auth-left-glow--2" />
         <div className="auth-left-content">
           <div className="auth-logo">
-            <Sparkles size={20} />
+            <div className="auth-logo-icon">
+              <Sparkles size={18} />
+            </div>
             <span>CrackTogether</span>
           </div>
           <h1>Master your interviews with AI</h1>
@@ -85,109 +93,161 @@ function Auth() {
             your progress — all powered by cutting-edge AI.
           </p>
           <div className="auth-features">
-            <div className="auth-feature-item">
-              <div className="auth-feature-dot" />
+            <div className="auth-feature-card">
+              <Zap size={18} />
               <span>AI-generated role-specific questions</span>
             </div>
-            <div className="auth-feature-item">
-              <div className="auth-feature-dot" />
-              <span>Voice-based interview practice</span>
+            <div className="auth-feature-card">
+              <BarChart3 size={18} />
+              <span>Detailed scoring & analytics</span>
             </div>
-            <div className="auth-feature-item">
-              <div className="auth-feature-dot" />
-              <span>Detailed scoring & feedback</span>
+            <div className="auth-feature-card">
+              <Shield size={18} />
+              <span>Secure & private practice sessions</span>
             </div>
+          </div>
+          <div className="auth-stats">
+            <div><strong>70+</strong><span>Users</span></div>
+            <div><strong>24/7</strong><span>AI Ready</span></div>
+            <div><strong>95%</strong><span>Satisfaction</span></div>
           </div>
         </div>
       </div>
 
       <div className="auth-right">
+        <div className="auth-right-bg" />
         <div className="auth-card">
-          <h2>{isLogin ? "Welcome back" : "Create account"}</h2>
-          <p className="auth-subtitle">
-            {isLogin
-              ? "Sign in to continue your interview practice"
-              : "Start your journey to interview success"}
-          </p>
+          <div className="auth-tabs">
+            <button
+              type="button"
+              className={`auth-tab ${isLogin ? "active" : ""}`}
+              onClick={() => switchMode(true)}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              className={`auth-tab ${!isLogin ? "active" : ""}`}
+              onClick={() => switchMode(false)}
+            >
+              Register
+            </button>
+          </div>
+
+          <div className="auth-card-header">
+            <h2>{isLogin ? "Welcome back" : "Create your account"}</h2>
+            <p className="auth-subtitle">
+              {isLogin
+                ? "Sign in to continue your interview journey"
+                : "Join thousands preparing smarter with AI"}
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
             {!isLogin && (
               <>
-                <div className="input-group">
-                  <User size={18} className="input-icon" />
-                  <input type="text" name="fullName" placeholder="Full Name" onChange={handleChange} required />
+                <div className="input-field">
+                  <label htmlFor="fullName">Full Name</label>
+                  <div className="input-group">
+                    <User size={18} className="input-icon" />
+                    <input id="fullName" type="text" name="fullName" placeholder="John Doe" onChange={handleChange} required />
+                  </div>
                 </div>
-                <div className="input-group">
-                  <Phone size={18} className="input-icon" />
-                  <input type="text" name="mobile" placeholder="Mobile Number" onChange={handleChange} required />
+                <div className="input-field">
+                  <label htmlFor="mobile">Mobile Number</label>
+                  <div className="input-group">
+                    <Phone size={18} className="input-icon" />
+                    <input id="mobile" type="text" name="mobile" placeholder="+91 98765 43210" onChange={handleChange} required />
+                  </div>
                 </div>
               </>
             )}
 
-            <div className="input-group">
-              <Mail size={18} className="input-icon" />
-              <input type="email" name="email" placeholder="Email address" onChange={handleChange} required />
+            <div className="input-field">
+              <label htmlFor="email">Email Address</label>
+              <div className="input-group">
+                <Mail size={18} className="input-icon" />
+                <input id="email" type="email" name="email" placeholder="you@example.com" onChange={handleChange} required />
+              </div>
             </div>
 
-            <div className="input-group">
-              <Lock size={18} className="input-icon" />
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                onChange={handleChange}
-                className="input-with-toggle"
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+            <div className="input-field">
+              <label htmlFor="password">Password</label>
+              <div className="input-group">
+                <Lock size={18} className="input-icon" />
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Enter your password"
+                  onChange={handleChange}
+                  className="input-with-toggle"
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             {!isLogin && (
               <>
-                <div className="input-group">
-                  <Lock size={18} className="input-icon" />
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    placeholder="Confirm Password"
-                    onChange={handleChange}
-                    className="input-with-toggle"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                <div className="input-field">
+                  <label htmlFor="confirmPassword">Confirm Password</label>
+                  <div className="input-group">
+                    <Lock size={18} className="input-icon" />
+                    <input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder="Re-enter password"
+                      onChange={handleChange}
+                      className="input-with-toggle"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
                 <label className="file-upload">
-                  <Camera size={18} />
-                  <span>{formData.profilePic ? formData.profilePic.name : "Upload profile photo (optional)"}</span>
+                  <div className="file-upload-icon"><Camera size={18} /></div>
+                  <div className="file-upload-text">
+                    <span className="file-upload-title">Profile photo</span>
+                    <span className="file-upload-hint">
+                      {formData.profilePic ? formData.profilePic.name : "Optional — JPG or PNG"}
+                    </span>
+                  </div>
                   <input type="file" name="profilePic" accept="image/*" onChange={handleChange} hidden />
                 </label>
               </>
             )}
 
             <button type="submit" className="auth-submit" disabled={loading}>
-              {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
+              {loading ? (
+                <span className="auth-submit-loading">Please wait...</span>
+              ) : (
+                <>
+                  {isLogin ? "Sign In" : "Create Account"}
+                  <ArrowRight size={18} />
+                </>
+              )}
             </button>
           </form>
 
-          <p className="auth-toggle">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button type="button" onClick={switchMode}>
-              {isLogin ? "Sign Up" : "Sign In"}
-            </button>
+          <p className="auth-secure">
+            <Shield size={14} />
+            Your data is encrypted and never shared
           </p>
         </div>
       </div>
