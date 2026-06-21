@@ -1,19 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Phone, Trophy, Award, Flame, BarChart3, Target } from "lucide-react";
-import { getProfile, getAnalytics } from "../services/userAPI";
+import { Mail, Trophy, Award, Flame, BarChart3, Target, Camera } from "lucide-react";
+import { toast } from "react-toastify";
+import { getProfile, getAnalytics, uploadProfilePhoto, syncUserToStorage } from "../services/userAPI";
+import { showAppError } from "../utils/appAlert";
 import "./Profile.css";
 
 function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user") || "null"));
   const [stats, setStats] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!user) { navigate("/auth"); return; }
-    getProfile().then((u) => { setUser(u); localStorage.setItem("user", JSON.stringify(u)); }).catch(() => {});
+    getProfile().then((u) => { setUser(u); syncUserToStorage(u); }).catch(() => {});
     getAnalytics().then(setStats).catch(() => {});
   }, []);
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      showAppError("Please upload a JPG or PNG image.", "Invalid file");
+      return;
+    }
+    try {
+      setUploading(true);
+      const updated = await uploadProfilePhoto(file);
+      setUser(updated);
+      syncUserToStorage(updated);
+      window.dispatchEvent(new Event("user-updated"));
+      toast.success("Profile photo updated!");
+    } catch (err) {
+      showAppError(err.response?.data?.message || "Failed to upload photo.", "Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   if (!user) return null;
 
@@ -27,7 +52,15 @@ function Profile() {
       <div className="profile-card">
         <div className="profile-banner" />
         <div className="profile-body">
-          <img src={avatarUrl} alt="Profile" className="profile-avatar" />
+          <div className="profile-avatar-wrap">
+            <img src={avatarUrl} alt="Profile" className="profile-avatar" />
+            <label className={`profile-photo-btn ${uploading ? "uploading" : ""}`} title="Upload profile photo">
+              <Camera size={16} />
+              <input type="file" accept="image/jpeg,image/png,image/jpg" onChange={handlePhotoUpload} hidden disabled={uploading} />
+            </label>
+          </div>
+          <p className="profile-upload-hint">{uploading ? "Uploading..." : "Tap camera to upload photo"}</p>
+
           <h1>{user.fullName}</h1>
           <p className="profile-role">Level {user.level || 1} Candidate</p>
 
@@ -38,7 +71,6 @@ function Profile() {
 
           <div className="profile-details">
             <div className="detail-item"><Mail size={16} /><span>{user.email}</span></div>
-            <div className="detail-item"><Phone size={16} /><span>{user.mobile}</span></div>
           </div>
 
           <div className="profile-stats">

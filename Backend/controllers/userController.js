@@ -19,15 +19,15 @@ const safeUser = (user) => ({
 });
 
 const registerUser = async (req, res) => {
-  const { fullName, mobile, email, password } = req.body;
-  const profilePic = req.file ? req.file.path : "";
+  const { fullName, email, password } = req.body;
+  const normalizedEmail = email?.trim().toLowerCase();
 
   try {
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ fullName, mobile, email, password: hashedPassword, profilePic });
+    const user = await User.create({ fullName, email: normalizedEmail, password: hashedPassword });
 
     res.json({ message: "User registered successfully", user: safeUser(user) });
   } catch (error) {
@@ -35,11 +35,29 @@ const registerUser = async (req, res) => {
   }
 };
 
+const updateProfilePhoto = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: "Please upload an image file" });
+
+    const user = await User.findByIdAndUpdate(
+      req.user,
+      { profilePic: req.file.path },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(safeUser(user));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  const normalizedEmail = email?.trim().toLowerCase();
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) return res.status(400).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -251,6 +269,7 @@ module.exports = {
   registerUser,
   loginUser,
   getProfile,
+  updateProfilePhoto,
   updateSettings,
   getDashboard,
   getPlatformStats,

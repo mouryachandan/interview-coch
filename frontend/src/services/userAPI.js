@@ -8,6 +8,14 @@ export const getLeaderboard = () => API.get("/users/leaderboard").then((r) => r.
 export const getAchievements = () => API.get("/users/achievements").then((r) => r.data);
 export const updateSettings = (settings) => API.put("/users/settings", settings).then((r) => r.data);
 
+export const uploadProfilePhoto = (file) => {
+  const data = new FormData();
+  data.append("profilePic", file);
+  return API.put("/users/profile-photo", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }).then((r) => r.data);
+};
+
 export const syncUserToStorage = (user) => {
   if (user) localStorage.setItem("user", JSON.stringify(user));
   return user;

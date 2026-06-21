@@ -4,7 +4,7 @@ import API from "../utils/api";
 import { toast } from "react-toastify";
 import { showAppError } from "../utils/appAlert";
 import {
-  Sparkles, Mail, Lock, User, Phone, Camera, Eye, EyeOff,
+  Sparkles, Mail, Lock, User, Eye, EyeOff,
   ArrowRight, Shield, Zap, BarChart3,
 } from "lucide-react";
 import "./Login.css";
@@ -16,24 +16,24 @@ function Auth() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    mobile: "",
     email: "",
     password: "",
     confirmPassword: "",
-    profilePic: null,
   });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    if (e.target.name === "profilePic") {
-      setFormData({ ...formData, profilePic: e.target.files[0] });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isLogin && formData.password.length < 6) {
+      showAppError("Password must be at least 6 characters long.", "Password too short");
+      return;
+    }
+
     setLoading(true);
     try {
       if (isLogin) {
@@ -50,13 +50,10 @@ function Auth() {
           showAppError("Please make sure both password fields match.", "Passwords don't match");
           return;
         }
-        const data = new FormData();
-        Object.keys(formData).forEach((key) => {
-          if (formData[key]) data.append(key, formData[key]);
-        });
-        data.set("email", formData.email.trim().toLowerCase());
-        await API.post("/users/register", data, {
-          headers: { "Content-Type": "multipart/form-data" },
+        await API.post("/users/register", {
+          fullName: formData.fullName,
+          email: formData.email.trim().toLowerCase(),
+          password: formData.password,
         });
         toast.success("Account created! Please sign in.");
         setIsLogin(true);
@@ -77,7 +74,7 @@ function Auth() {
 
   return (
     <div className="auth-page">
-      <div className="auth-left">
+      <aside className="auth-left">
         <div className="auth-left-glow auth-left-glow--1" />
         <div className="auth-left-glow auth-left-glow--2" />
         <div className="auth-left-content">
@@ -112,7 +109,7 @@ function Auth() {
             <div><strong>95%</strong><span>Satisfaction</span></div>
           </div>
         </div>
-      </div>
+      </aside>
 
       <div className="auth-right">
         <div className="auth-right-bg" />
@@ -139,35 +136,26 @@ function Auth() {
             <p className="auth-subtitle">
               {isLogin
                 ? "Sign in to continue your interview journey"
-                : "Join thousands preparing smarter with AI"}
+                : "Create account with email and password (min. 6 characters)"}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
             {!isLogin && (
-              <>
-                <div className="input-field">
-                  <label htmlFor="fullName">Full Name</label>
-                  <div className="input-group">
-                    <User size={18} className="input-icon" />
-                    <input id="fullName" type="text" name="fullName" placeholder="John Doe" onChange={handleChange} required />
-                  </div>
+              <div className="input-field">
+                <label htmlFor="fullName">Full Name</label>
+                <div className="input-group">
+                  <User size={18} className="input-icon" />
+                  <input id="fullName" type="text" name="fullName" placeholder="John Doe" value={formData.fullName} onChange={handleChange} required />
                 </div>
-                <div className="input-field">
-                  <label htmlFor="mobile">Mobile Number</label>
-                  <div className="input-group">
-                    <Phone size={18} className="input-icon" />
-                    <input id="mobile" type="text" name="mobile" placeholder="+91 98765 43210" onChange={handleChange} required />
-                  </div>
-                </div>
-              </>
+              </div>
             )}
 
             <div className="input-field">
               <label htmlFor="email">Email Address</label>
               <div className="input-group">
                 <Mail size={18} className="input-icon" />
-                <input id="email" type="email" name="email" placeholder="you@example.com" onChange={handleChange} required />
+                <input id="email" type="email" name="email" placeholder="you@example.com" value={formData.email} onChange={handleChange} required />
               </div>
             </div>
 
@@ -179,9 +167,11 @@ function Auth() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="Enter your password"
+                  placeholder={isLogin ? "Enter your password" : "Min. 6 characters"}
+                  value={formData.password}
                   onChange={handleChange}
                   className="input-with-toggle"
+                  minLength={isLogin ? undefined : 6}
                   required
                 />
                 <button
@@ -196,41 +186,31 @@ function Auth() {
             </div>
 
             {!isLogin && (
-              <>
-                <div className="input-field">
-                  <label htmlFor="confirmPassword">Confirm Password</label>
-                  <div className="input-group">
-                    <Lock size={18} className="input-icon" />
-                    <input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      placeholder="Re-enter password"
-                      onChange={handleChange}
-                      className="input-with-toggle"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                    >
-                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
+              <div className="input-field">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <div className="input-group">
+                  <Lock size={18} className="input-icon" />
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="Re-enter password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="input-with-toggle"
+                    minLength={6}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
-                <label className="file-upload">
-                  <div className="file-upload-icon"><Camera size={18} /></div>
-                  <div className="file-upload-text">
-                    <span className="file-upload-title">Profile photo</span>
-                    <span className="file-upload-hint">
-                      {formData.profilePic ? formData.profilePic.name : "Optional — JPG or PNG"}
-                    </span>
-                  </div>
-                  <input type="file" name="profilePic" accept="image/*" onChange={handleChange} hidden />
-                </label>
-              </>
+              </div>
             )}
 
             <button type="submit" className="auth-submit" disabled={loading}>

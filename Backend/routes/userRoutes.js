@@ -9,6 +9,7 @@ const {
   registerUser,
   loginUser,
   getProfile,
+  updateProfilePhoto,
   updateSettings,
   getDashboard,
   getPlatformStats,
@@ -23,11 +24,12 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage });
 
-router.post("/register", upload.single("profilePic"), validatePassword, registerUser);
+router.post("/register", validatePassword, registerUser);
 router.post("/login", loginUser);
 router.get("/platform-stats", getPlatformStats);
 router.get("/dashboard", protect, getDashboard);
 router.get("/profile", protect, getProfile);
+router.put("/profile-photo", protect, upload.single("profilePic"), updateProfilePhoto);
 router.put("/settings", protect, updateSettings);
 router.get("/analytics", protect, getAnalytics);
 router.get("/leaderboard", protect, getLeaderboard);
